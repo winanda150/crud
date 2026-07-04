@@ -5,6 +5,18 @@
     header("location: login.php");
     exit();
   }
+
+  include 'koneksi.php';
+
+  // Hitung jumlah user
+  $query_users = mysqli_query($conn, "SELECT COUNT(id) as total_users FROM user");
+  $total_users = mysqli_fetch_assoc($query_users)['total_users'];
+
+  // Hitung jumlah transaksi dan total omset penjualan
+  $query_penjualan = mysqli_query($conn, "SELECT COUNT(id) as total_penjualan, SUM(total) as total_omset FROM penjualan");
+  $data_penjualan = mysqli_fetch_assoc($query_penjualan);
+  $total_penjualan = $data_penjualan['total_penjualan'] ?? 0;
+  $total_omset = $data_penjualan['total_omset'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +24,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Project UAS</title>
+  <title>Project UAS | Dashboard</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -40,9 +52,9 @@
 
     <ul class="navbar-nav ml-auto">
       <li>
-        <a href="logout.php" class="btn btn-danger btn-sm" onclick="return confirm('Apakah yakin Log Out?')">
-        <i class="fas fa-sign-out-alt mr-1"></i>Log out
-        </a>
+        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#logoutModal">
+          <i class="fas fa-sign-out-alt mr-1"></i>Log out
+        </button>
       </li>
     </ul>
   </nav>
@@ -66,7 +78,7 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a href="index.php" class="nav-link active">
+            <a href="dashboard.php" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Dashboard
@@ -92,16 +104,15 @@
           </li>
           <li class="nav-header">TRANSAKSI</li>
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="penjualan.php" class="nav-link">
               <i class="nav-icon far fa-calendar-alt"></i>
               <p>
                 Penjualan
-                <span class="badge badge-info right">2</span>
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon far fa-image"></i>
               <p>
                 Pembelian
@@ -111,7 +122,7 @@
 
           <li class="nav-header">LAPORAN</li>
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-file"></i>
               <p>Laporan Penjualan</p>
             </a>
@@ -130,12 +141,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>DataTables</h1>
+            <h1>Dashboard</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-              <li class="breadcrumb-item active">DataTables</li>
+              <li class="breadcrumb-item active">Dashboard</li>
             </ol>
           </div>
         </div>
@@ -144,23 +155,54 @@
 
     <!-- Main content -->
     <section class="content">
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">DataTable with default features</h3>
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3><?= number_format($total_penjualan); ?></h3>
+                <p>Jumlah Transaksi Penjualan</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-bag"></i>
+              </div>
+              <a href="penjualan.php" class="small-box-footer">Lihat Detail <i class="fas fa-arrow-circle-right"></i></a>
             </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-<!-- disini -->
-            </div>
-            <!-- /.card-body -->
           </div>
-          <!-- /.card -->
+          <!-- ./col -->
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>Rp <?= number_format($total_omset, 0, ',', '.'); ?></h3>
+                <p>Total Omset Penjualan</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-stats-bars"></i>
+              </div>
+              <a href="penjualan.php" class="small-box-footer">Lihat Detail <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3><?= number_format($total_users); ?></h3>
+                <p>Jumlah Pengguna Terdaftar</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              <a href="user.php" class="small-box-footer">Lihat Detail <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
         </div>
-        <!-- /.col -->
-      </div>
-      <!-- /.row -->
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
   </div>
@@ -206,5 +248,26 @@
     });
   });
 </script>
+
+<!-- Modal Logout -->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Log Out</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin keluar?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <a href="logout.php" class="btn btn-danger">Log Out</a>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -45,6 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
       </li>
     </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li>
+        <a href="logout.php" class="btn btn-danger btn-sm" onclick="return confirm('Apakah yakin Log Out?')">
+        <i class="fas fa-sign-out-alt mr-1"></i>Log out
+        </a>
+      </li>
+    </ul>
   </nav>
 
   <aside class="main-sidebar sidebar-dark-primary elevation-4">

@@ -53,7 +53,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Project UAS</title>
+  <title>Project UAS | User</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -76,6 +76,14 @@ $data = mysqli_query($conn, "SELECT * FROM user");
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+      <li>
+        <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#logoutModal">
+          <i class="fas fa-sign-out-alt mr-1"></i>Log out
+        </button>
       </li>
     </ul>
   </nav>
@@ -125,16 +133,15 @@ $data = mysqli_query($conn, "SELECT * FROM user");
           </li>
           <li class="nav-header">TRANSAKSI</li>
           <li class="nav-item">
-            <a href="index.php" class="nav-link">
+            <a href="penjualan.php" class="nav-link">
               <i class="nav-icon far fa-calendar-alt"></i>
               <p>
                 Penjualan
-                <span class="badge badge-info right">2</span>
               </p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="index.php" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon far fa-image"></i>
               <p>
                 Pembelian
@@ -144,7 +151,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
 
           <li class="nav-header">LAPORAN</li>
           <li class="nav-item">
-            <a href="" class="nav-link">
+            <a href="#" class="nav-link">
               <i class="nav-icon fas fa-file"></i>
               <p>Laporan Penjualan</p>
             </a>
@@ -163,12 +170,13 @@ $data = mysqli_query($conn, "SELECT * FROM user");
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>DataTables</h1>
+            <h1>Data User</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-              <li class="breadcrumb-item active">DataTables</li>
+              <li class="breadcrumb-item"><a href="user.php">Data Master</a></li>
+              <li class="breadcrumb-item active">Data User</li>
             </ol>
           </div>
         </div>
@@ -181,7 +189,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">DataTable with default features</h3>
+              <h3 class="card-title">Daftar User</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
@@ -222,11 +230,8 @@ $data = mysqli_query($conn, "SELECT * FROM user");
 
                       <tbody>
 
-                          <?php
-                          $no = 1;
-
-                          while($row = mysqli_fetch_assoc($data)){
-                          ?>
+                          <?php $no = 1; ?>
+                          <?php while($row = mysqli_fetch_assoc($data)): ?>
 
                           <tr>
                               <td><?= $no++; ?></td>
@@ -254,8 +259,8 @@ $data = mysqli_query($conn, "SELECT * FROM user");
 
                               </td>
                           </tr>
-
-                          <?php } ?>
+                          
+                          <?php endwhile; ?>
 
                       </tbody>
 
@@ -319,7 +324,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
       $('#editUserNama').val(button.data('nama'));
       $('#editUserUsername').val(button.data('username'));
       $('#editUserPassword').val(button.data('password'));
-      $('#editUserStatus').val(button.data('status') == 'aktif' || button.data('status') == 1 ? 1 : 0); // Set value 1 atau 0
+      $('#editUserStatus').val(button.data('status')); // Set value 1 atau 0
     });
 
     $('#deleteUserModal').on('show.bs.modal', function (event) {
@@ -427,6 +432,27 @@ $data = mysqli_query($conn, "SELECT * FROM user");
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
         <a href="#" id="confirmDeleteButton" class="btn btn-danger">Hapus</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Logout -->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Log Out</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin keluar?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <a href="logout.php" class="btn btn-danger">Log Out</a>
       </div>
     </div>
   </div>
