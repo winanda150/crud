@@ -9,20 +9,80 @@
   include 'koneksi.php';
 
   // Hitung jumlah user
-  $query_users = mysqli_query($conn, "SELECT COUNT(id) as total_users FROM user");
-  $total_users = mysqli_fetch_assoc($query_users)['total_users'];
+  $stmt_users = $conn->prepare("SELECT COUNT(id) as total_users FROM user");
+  $stmt_users->execute();
+  $result_users = $stmt_users->get_result();
+  $total_users = $result_users->fetch_assoc()['total_users'];
+  $stmt_users->close();
 
   // Hitung jumlah transaksi dan total omset penjualan
-  $query_penjualan = mysqli_query($conn, "SELECT COUNT(id) as total_penjualan, SUM(total) as total_omset FROM penjualan");
-  $data_penjualan = mysqli_fetch_assoc($query_penjualan);
+  $stmt_penjualan = $conn->prepare("SELECT COUNT(id) as total_penjualan, SUM(total) as total_omset FROM penjualan");
+  $stmt_penjualan->execute();
+  $result_penjualan = $stmt_penjualan->get_result();
+  $data_penjualan = $result_penjualan->fetch_assoc();
   $total_penjualan = $data_penjualan['total_penjualan'] ?? 0;
   $total_omset = $data_penjualan['total_omset'] ?? 0;
+  $stmt_penjualan->close();
 
   // Hitung jumlah transaksi dan total biaya pembelian
-  $query_pembelian = mysqli_query($conn, "SELECT COUNT(id) as total_pembelian, SUM(total) as total_biaya FROM pembelian");
-  $data_pembelian = mysqli_fetch_assoc($query_pembelian);
+  $stmt_pembelian = $conn->prepare("SELECT COUNT(id) as total_pembelian, SUM(total) as total_biaya FROM pembelian");
+  $stmt_pembelian->execute();
+  $result_pembelian = $stmt_pembelian->get_result();
+  $data_pembelian = $result_pembelian->fetch_assoc();
   $total_pembelian = $data_pembelian['total_pembelian'] ?? 0;
   $total_biaya_pembelian = $data_pembelian['total_biaya'] ?? 0;
+  $stmt_pembelian->close();
+
+  // Hitung Keuntungan
+  $keuntungan = $total_omset - $total_biaya_pembelian;
+
+  // Data untuk Chart Penjualan dan Pembelian Bulanan
+  $tahun_sekarang = date('Y');
+  // Data Penjualan
+  $query_chart_penjualan = "
+      SELECT 
+          MONTH(tanggal) as bulan, 
+          SUM(total) as total_bulanan 
+      FROM penjualan 
+      WHERE YEAR(tanggal) = ?
+      GROUP BY MONTH(tanggal)
+      ORDER BY MONTH(tanggal) ASC";
+  $stmt_chart_penjualan = $conn->prepare($query_chart_penjualan);
+  $stmt_chart_penjualan->bind_param("i", $tahun_sekarang);
+  $stmt_chart_penjualan->execute();
+  $result_chart_penjualan = $stmt_chart_penjualan->get_result();
+
+  $total_data_penjualan = array_fill(0, 12, 0); // Inisialisasi array penjualan dengan 12 nilai 0
+  $nama_bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+  // Proses hasil query penjualan
+  while ($row = $result_chart_penjualan->fetch_assoc()) {
+      $total_data_penjualan[$row['bulan'] - 1] = $row['total_bulanan'];
+  }
+  $stmt_chart_penjualan->close();
+
+  // Data Pembelian
+  $query_chart_pembelian = "
+      SELECT 
+          MONTH(tanggal) as bulan, 
+          SUM(total) as total_bulanan 
+      FROM pembelian 
+      WHERE YEAR(tanggal) = ?
+      GROUP BY MONTH(tanggal)
+      ORDER BY MONTH(tanggal) ASC";
+  $stmt_chart_pembelian = $conn->prepare($query_chart_pembelian);
+  $stmt_chart_pembelian->bind_param("i", $tahun_sekarang);
+  $stmt_chart_pembelian->execute();
+  $result_chart_pembelian = $stmt_chart_pembelian->get_result();
+  
+  $total_data_pembelian = array_fill(0, 12, 0); // Inisialisasi array pembelian dengan 12 nilai 0
+
+  // Proses hasil query pembelian
+  while ($row = $result_chart_pembelian->fetch_assoc()) {
+      // array index is 0-11, but month is 1-12
+      $total_data_pembelian[$row['bulan'] - 1] = $row['total_bulanan'];
+  }
+  $stmt_chart_pembelian->close();
 ?>
 
 <!DOCTYPE html>
@@ -38,8 +98,6 @@
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
@@ -128,7 +186,7 @@
 
           <li class="nav-header">LAPORAN</li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="laporan_penjualan.php" class="nav-link">
               <i class="nav-icon fas fa-file"></i>
               <p>Laporan Penjualan</p>
             </a>
@@ -163,7 +221,7 @@
     <section class="content">
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
-        <div class="row justify-content-center">
+        <div class="row">
           <div class="col-lg-4 col-6">
             <!-- small box -->
             <div class="small-box bg-info">
@@ -234,6 +292,63 @@
             </div>
           </div>
           <!-- ./col -->
+          <div class="col-lg-4 col-6">
+            <!-- small box -->
+            <div class="small-box bg-purple">
+              <div class="inner">
+                <h3>Rp <?= number_format($keuntungan, 0, ',', '.'); ?></h3>
+                <p>Keuntungan</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-arrow-graph-up-right"></i>
+              </div>
+              <a href="laporan_penjualan.php" class="small-box-footer">Lihat Detail <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+        </div>
+        <!-- /.row -->
+
+        <!-- Main row -->
+        <div class="row">
+          <!-- Left col -->
+          <section class="col-lg-7 connectedSortable">
+            <!-- Sales chart -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-chart-line mr-1"></i>
+                  Grafik Penjualan vs Pembelian Tahun <?= $tahun_sekarang ?>
+                </h3>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="chart">
+                  <canvas id="monthlyBarChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </section>
+          <!-- /.Left col -->
+
+          <!-- right col (We are only adding the ID to make the widgets sortable)-->
+          <section class="col-lg-5 connectedSortable">
+            <!-- Donut Chart -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="fas fa-chart-pie mr-1"></i>
+                  Komposisi Omset
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="chart">
+                  <canvas id="profitChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </section>
         </div>
         <!-- /.row -->
       </div><!-- /.container-fluid -->
@@ -261,25 +376,78 @@
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables -->
-<script src="plugins/datatables/jquery.dataTables.js"></script>
-<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+<!-- ChartJS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="dist/js/demo.js"></script>
 <!-- page script -->
 <script>
-  $(function () {
-    $("#example1").DataTable();
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-    });
+  $(function() {
+    'use strict'
+
+    // This will get the first returned node in the jQuery collection.
+    var salesChart = new Chart($('#monthlyBarChart').get(0).getContext('2d'), { 
+      type: 'bar', 
+      data: {
+        labels: <?= json_encode($nama_bulan) ?>,
+        datasets: [
+          {
+            label: 'Omset Penjualan',
+            backgroundColor: '#28a745', // Warna hijau (bg-success)
+            hoverBackgroundColor: '#218838', // Warna hijau lebih gelap saat hover
+            borderColor: '#28a745',
+            data: <?= json_encode($total_data_penjualan) ?>,
+          },
+          {
+            label: 'Biaya Pembelian',
+            backgroundColor: '#dc3545', // Warna merah (bg-danger)
+            hoverBackgroundColor: '#c82333', // Warna merah lebih gelap saat hover
+            borderColor: '#dc3545',
+            data: <?= json_encode($total_data_pembelian) ?>
+          }
+        ]
+      }, 
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            grid: {
+              display: true
+            },
+            ticks: {
+              beginAtZero: true
+            }
+          }
+        }
+      }
+    })
+
+    //-------------
+    //- DONUT CHART -
+    //-------------
+    var profitChartCanvas = $('#profitChart').get(0).getContext('2d')
+    var profitChartData = {
+      labels: [ 'Biaya Pembelian', 'Keuntungan' ],
+      datasets: [ {
+          data: [<?= $total_biaya_pembelian ?>, <?= $keuntungan ?>],
+          backgroundColor: ['#dc3545', '#28a745'], // bg-danger, bg-success
+      }]
+    }
+    var profitChart = new Chart(profitChartCanvas, {
+      type: 'doughnut',
+      data: profitChartData
+    })
   });
 </script>
 

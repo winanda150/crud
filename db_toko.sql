@@ -34,7 +34,7 @@ CREATE TABLE `pembelian` (
 /*Data for the table `pembelian` */
 
 insert  into `pembelian`(`id`,`no_transaksi`,`tanggal`,`supplier`,`barang`,`jumlah_barang`,`total`) values 
-(1,'TRB-20260704-0001','2026-07-05','PT Erajaya Swasembada','Samsung Galaxy S24 Ultra',10,139990000);
+(1,'TRB-20260704-0001','2026-07-04','PT Erajaya Swasembada','Samsung Galaxy S24 Ultra',5,69995000);
 
 /*Table structure for table `penjualan` */
 
@@ -54,7 +54,7 @@ CREATE TABLE `penjualan` (
 /*Data for the table `penjualan` */
 
 insert  into `penjualan`(`id`,`no_transaksi`,`tanggal`,`customer`,`barang`,`jumlah_barang`,`total`) values 
-(1,'TRJ-20260704-0001','2026-07-04','I Wayan Winanda','Iphone 17 Pro Max',1,26499000.00);
+(1,'TRJ-20260704-0001','2026-07-04','I Wayan Winanda','Iphone 17 Pro Max',3,79497000.00);
 
 /*Table structure for table `user` */
 

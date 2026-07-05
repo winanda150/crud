@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </li>
           <li class="nav-header">LAPORAN</li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="laporan_penjualan.php" class="nav-link">
               <i class="nav-icon fas fa-file"></i>
               <p>Laporan Penjualan</p>
             </a>
