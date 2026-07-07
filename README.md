@@ -2,7 +2,7 @@
 
 ![Phone Store CRUD Dashboard](docs/assets/img/Screenshot%20(198).png)
 
-Aplikasi CRUD Toko HP berbasis web yang dirancang untuk mengelola data, transaksi penjualan dan pembelian, laporan, serta dashboard interaktif. Phone Store CRUD merupakan aplikasi berbasis web yang dikembangkan sebagai Project Ujian Akhir Semester (UAS) pada mata kuliah Pemrograman Web.
+Aplikasi CRUD Toko HP berbasis web yang dirancang untuk mengelola data, transaksi penjualan dan pembelian, laporan transaksi, serta dashboard interaktif. Phone Store CRUD merupakan aplikasi berbasis web yang dikembangkan sebagai Project Ujian Akhir Semester (UAS) pada mata kuliah Pemrograman Web.
 
 Project ini mengangkat studi kasus sebuah Toko HP dengan tujuan mengimplementasikan konsep Create, Read, Update, dan Delete (CRUD) dalam sebuah sistem informasi berbasis web. Aplikasi ini dirancang untuk membantu proses pengelolaan data toko secara lebih efektif, terstruktur, dan mudah digunakan dibandingkan dengan proses administrasi secara manual.
 
