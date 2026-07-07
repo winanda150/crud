@@ -6,7 +6,6 @@ $error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
 $success = isset($_SESSION['success']) ? $_SESSION['success'] : '';
 
 // Hapus session notifikasi setelah diambil
-// Hapus session notifikasi setelah diambil
 unset($_SESSION['error']);
 unset($_SESSION['success']);
 
