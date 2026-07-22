@@ -227,7 +227,7 @@
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
@@ -241,7 +241,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
@@ -255,7 +255,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
@@ -269,7 +269,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-primary">
               <div class="inner">
@@ -283,7 +283,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
@@ -297,7 +297,7 @@
             </div>
           </div>
           <!-- ./col -->
-          <div class="col-lg-4 col-6">
+          <div class="col-lg-4 col-md-6 col-sm-6 col-12">
             <!-- small box -->
             <div class="small-box bg-purple">
               <div class="inner">

@@ -278,7 +278,8 @@
                   </div>
                 <?php endif; ?>
 
-                <table id="example1" class="table table-bordered table-striped">
+                <div class="table-responsive">
+                <table id="example1" class="table table-bordered table-striped" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -321,6 +322,7 @@
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
             <!-- /.card-body -->
           </div>

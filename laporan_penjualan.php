@@ -164,17 +164,17 @@
               <h3 class="card-title">Filter Laporan</h3>
             </div>
             <div class="card-body no-print">
-              <form method="GET" action="" class="form-inline">
-                <div class="form-group mb-2">
+              <form method="GET" action="" class="form-inline align-items-end">
+                <div class="form-group mb-2 mr-sm-3">
                   <label for="start_date" class="mr-2">Dari Tanggal</label>
                   <input type="date" name="start_date" id="start_date" class="form-control" value="<?= htmlspecialchars($start_date) ?>">
                 </div>
-                <div class="form-group mx-sm-3 mb-2">
+                <div class="form-group mb-2 mr-sm-3">
                   <label for="end_date" class="mr-2">Sampai Tanggal</label>
                   <input type="date" name="end_date" id="end_date" class="form-control" value="<?= htmlspecialchars($end_date) ?>">
                 </div>
-                <button type="submit" class="btn btn-primary mb-2">Tampilkan</button>
-                <button type="button" class="btn btn-secondary mb-2 ml-2" onclick="window.print()">
+                <button type="submit" class="btn btn-primary mb-2 mr-sm-3">Tampilkan</button>
+                <button type="button" class="btn btn-secondary mb-2" onclick="window.print()">
                   <i class="fas fa-print"></i> Cetak
                 </button>
               </form>
@@ -187,7 +187,8 @@
               <h3 class="card-title no-print">Daftar Transaksi Penjualan</h3>
             </div>
             <div class="card-body">
-              <table class="table table-bordered table-striped">
+              <div class="table-responsive">
+              <table class="table table-bordered table-striped" style="white-space: nowrap;">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -223,6 +224,7 @@
                   </tr>
                 </tfoot>
               </table>
+              </div>
             </div>
           </div>
         </div>
