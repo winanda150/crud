@@ -64,7 +64,7 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nama_lengkap` varchar(50) DEFAULT NULL,
   `username` varchar(50) DEFAULT NULL,
-  `password` varchar(50) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -72,7 +72,7 @@ CREATE TABLE `user` (
 /*Data for the table `user` */
 
 insert  into `user`(`id`,`nama_lengkap`,`username`,`password`,`status`) values 
-(1,'I Wayan Winanda','Winanda','2501010182',1);
+(1,'I Wayan Winanda','Winanda','$2y$10$9TlyAzVdTeuo9/h/ljLF0uZOIp1L9fpIhYcaibvpjqe9XObQP6djC',1);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -29,34 +29,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $password = mysqli_real_escape_string($conn, trim($_POST['password']));
     $status = isset($_POST['status']) ? intval($_POST['status']) : 0; // Mengubah status menjadi integer (1 atau 0)
-    
-    if ($nama_lengkap === '' || $username === '' || $password === '') {
-        $error = 'Semua field harus diisi.';
-    } else {
-        if (isset($_POST['edit_user'])) {
-            $id = intval($_POST['id']);
-            $update = mysqli_query(
-                $conn,
-                "UPDATE user SET nama_lengkap='$nama_lengkap', username='$username', password='$password', status=$status WHERE id=$id"
-            );
 
-            if ($update) {
-                $success = 'Data user berhasil diperbarui.';
+    if (isset($_POST['edit_user'])) {
+        $id = intval($_POST['id']);
+        if ($nama_lengkap === '' || $username === '') {
+            $_SESSION['error'] = 'Nama lengkap dan username harus diisi.';
+        } else {
+            if (!empty($password)) {
+                // Jika password diisi, hash password baru
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $conn->prepare("UPDATE user SET nama_lengkap=?, username=?, password=?, status=? WHERE id=?");
+                $stmt->bind_param("sssii", $nama_lengkap, $username, $hashed_password, $status, $id);
             } else {
-                $error = 'Gagal mengubah data: ' . mysqli_error($conn);
+                // Jika password tidak diisi, jangan update password
+                $stmt = $conn->prepare("UPDATE user SET nama_lengkap=?, username=?, status=? WHERE id=?");
+                $stmt->bind_param("ssii", $nama_lengkap, $username, $status, $id);
             }
-        } elseif (isset($_POST['add_user'])) {
-            $insert = mysqli_query(
-                $conn,
-                "INSERT INTO user (nama_lengkap, username, password, status) VALUES ('$nama_lengkap', '$username', '$password', $status)"
-            );
 
-            if ($insert) {
-                $success = 'User baru berhasil ditambahkan.';
+            if ($stmt->execute()) {
+                $_SESSION['success'] = 'Data user berhasil diperbarui.';
             } else {
-                $error = 'Gagal menambahkan user: ' . mysqli_error($conn);
+                $_SESSION['error'] = 'Gagal mengubah data: ' . $stmt->error;
             }
+            $stmt->close();
         }
+        header('Location: user.php');
+        exit;
+    } elseif (isset($_POST['add_user'])) {
+        if ($nama_lengkap === '' || $username === '' || $password === '') {
+            $_SESSION['error'] = 'Semua field harus diisi.';
+        } else {
+            // Hash password sebelum disimpan
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $conn->prepare("INSERT INTO user (nama_lengkap, username, password, status) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("sssi", $nama_lengkap, $username, $hashed_password, $status);
+
+            if ($stmt->execute()) {
+                $_SESSION['success'] = 'User baru berhasil ditambahkan.';
+            } else {
+                $_SESSION['error'] = 'Gagal menambahkan user: ' . $stmt->error;
+            }
+            $stmt->close();
+        }
+        header('Location: user.php');
+        exit;
     }
 }
 
@@ -258,7 +274,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
                               <td><?= $no++; ?></td>
                               <td><?= $row['nama_lengkap']; ?></td>
                               <td><?= $row['username']; ?></td>
-                              <td><?= $row['password']; ?></td>
+                              <td>********</td>
                               <td><span class="badge badge-<?= $row['status'] == 1 ? 'success' : 'danger'; ?>"><?= $row['status'] == 1 ? 'Aktif' : 'Tidak Aktif'; ?></span></td>
 
                               <td>
@@ -268,8 +284,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
                                     data-target="#editUserModal"
                                     data-id="<?= $row['id']; ?>"
                                     data-nama="<?= htmlspecialchars($row['nama_lengkap'], ENT_QUOTES); ?>"
-                                    data-username="<?= htmlspecialchars($row['username'], ENT_QUOTES); ?>"
-                                    data-password="<?= htmlspecialchars($row['password'], ENT_QUOTES); ?>"
+                                    data-username="<?= htmlspecialchars($row['username'], ENT_QUOTES); ?>"                                    
                                     data-status="<?= htmlspecialchars($row['status'], ENT_QUOTES); ?>">
                                       <i class="fas fa-edit"></i>
                                   </button>
@@ -345,8 +360,8 @@ $data = mysqli_query($conn, "SELECT * FROM user");
       var button = $(this);
       $('#editUserId').val(button.data('id'));
       $('#editUserNama').val(button.data('nama'));
-      $('#editUserUsername').val(button.data('username'));
-      $('#editUserPassword').val(button.data('password'));
+      $('#editUserUsername').val(button.data('username'));      
+      $('#editUserPassword').attr('placeholder', 'Kosongkan jika tidak ingin diubah');
       $('#editUserStatus').val(button.data('status')); // Set value 1 atau 0
     });
 
@@ -421,7 +436,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
           </div>
           <div class="form-group">
             <label for="editUserPassword">Password</label>
-            <input type="text" name="password" id="editUserPassword" class="form-control" required>
+            <input type="text" name="password" id="editUserPassword" class="form-control" placeholder="Kosongkan jika tidak ingin diubah">
           </div>
           <div class="form-group">
             <label for="editUserStatus">Status</label>

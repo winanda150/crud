@@ -16,18 +16,20 @@
 
     if($result->num_rows === 1) {
       $user = $result->fetch_assoc();
-      // Di aplikasi production, gunakan password_verify()
-      // if (password_verify($password, $user['password'])) {
-      // Untuk saat ini, kita samakan dengan logika lama
-      if ($password === $user['password']) {
+
+      // Verifikasi password yang diinput dengan hash di database
+      if (password_verify($password, $user['password'])) {
         $_SESSION['login'] = true;
         $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
         header ("Location: dashboard.php"); //untuk masuk ke dashboard
+        exit();
       } else {
-        $error="Username dan password SALAH atau tidak ditemukan";
+        $error="Username atau password salah.";
+      }
+    } else {
+        $error="Username atau password salah.";
       }
     }
-  }
 ?>
 
 <!DOCTYPE html>
@@ -61,11 +63,12 @@
       <p class="login-box-msg">Sign in untuk masuk ke aplikasi</p>
       
       <!-- tampilkan error -->
-      <?php
-        if($error != ""):
-      ?>
-      <div class="error">
-          <?= $error; ?>
+      <?php if($error != ""): ?>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <?= htmlspecialchars($error); ?>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
       </div>
       <?php endif; ?>
 
