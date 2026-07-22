@@ -9,6 +9,21 @@ $success = isset($_SESSION['success']) ? $_SESSION['success'] : '';
 unset($_SESSION['error']);
 unset($_SESSION['success']);
 
+// Logika untuk menghapus data user
+if (isset($_GET['hapus_id'])) {
+    $id = intval($_GET['hapus_id']);
+    // Sebaiknya gunakan prepared statement juga di sini untuk keamanan
+    $stmt = $conn->prepare("DELETE FROM user WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    if ($stmt->execute()) {
+        $_SESSION['success'] = 'User berhasil dihapus.';
+    } else {
+        $_SESSION['error'] = 'Gagal menghapus user: ' . $stmt->error;
+    }
+    header('Location: user.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama_lengkap = mysqli_real_escape_string($conn, trim($_POST['nama_lengkap']));
     $username = mysqli_real_escape_string($conn, trim($_POST['username']));
@@ -335,7 +350,7 @@ $data = mysqli_query($conn, "SELECT * FROM user");
 
     $('#deleteUserModal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
-      $('#confirmDeleteButton').attr('href', 'hapus_user.php?id=' + button.data('id'));
+      $('#confirmDeleteButton').attr('href', 'user.php?hapus_id=' + button.data('id'));
     });
   });
 </script>

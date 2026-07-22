@@ -13,6 +13,20 @@
   if (isset($_SESSION['error'])) { $error = $_SESSION['error']; unset($_SESSION['error']); }
   if (isset($_SESSION['success'])) { $success = $_SESSION['success']; unset($_SESSION['success']); }
 
+  // Logika untuk menghapus data pembelian
+  if (isset($_GET['hapus_id'])) {
+      $id = intval($_GET['hapus_id']);
+      $stmt = $conn->prepare("DELETE FROM pembelian WHERE id = ?");
+      $stmt->bind_param("i", $id);
+      if ($stmt->execute()) {
+          $_SESSION['success'] = 'Transaksi berhasil dihapus.';
+      } else {
+          $_SESSION['error'] = 'Gagal menghapus transaksi: ' . $stmt->error;
+      }
+      header('Location: pembelian.php');
+      exit;
+  }
+
   $tanggal_hari_ini = date('Y-m-d');
   $prefix = 'TRB-' . date('Ymd') . '-'; // TRB untuk Transaksi Beli
 
@@ -508,7 +522,7 @@
     // Script untuk mengatur link hapus
     $('#deletePembelianModal').on('show.bs.modal', function (event) {
       var button = $(event.relatedTarget);
-      $('#confirmDeleteButton').attr('href', 'hapus_pembelian.php?id=' + button.data('id'));
+      $('#confirmDeleteButton').attr('href', 'pembelian.php?hapus_id=' + button.data('id'));
     });
 
     // Fungsi untuk format Rupiah
